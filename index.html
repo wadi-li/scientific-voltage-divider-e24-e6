@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b6e74">
+<title>Делитель напряжения E24/E6 — worst-case, ТКС/ТКЕ, АЧХ</title>
+<style>
+:root,[data-theme=light]{--bg:#eef0ec;--panel:#fff;--field:#f7f8f5;--ink:#161b19;--mut:#4f5955;--bd:#cfd5cf;--a:#0b6e74;--a2:#dcefee;--ok:#1e7b3a;--warn:#9a5600;--bad:#b0244f;--band:rgba(192,57,92,.20);--bandl:rgba(176,36,79,.8);--grid:rgba(30,40,36,.13);--sh:0 1px 2px rgba(20,30,25,.06),0 4px 14px rgba(20,30,25,.05)}
+[data-theme=dark]{--bg:#121514;--panel:#1b1f1e;--field:#232826;--ink:#e8ece9;--mut:#a7b1ad;--bd:#36403c;--a:#4fc1c6;--a2:#183a3b;--ok:#7fd88f;--warn:#f0b35e;--bad:#f08aa9;--band:rgba(240,120,160,.22);--bandl:rgba(240,138,169,.85);--grid:rgba(230,240,235,.12);--sh:none}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:14px/1.35 "Segoe UI",system-ui,-apple-system,Roboto,"Noto Sans",sans-serif;-webkit-text-size-adjust:100%}
+.num,td,input,.val{font-variant-numeric:tabular-nums}
+button,input,select{font:inherit;color:inherit}
+/* header */
+.bar{height:48px;display:flex;align-items:center;gap:12px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--bd)}
+.logo{width:28px;height:28px;flex:none}
+.ttl{font-weight:700;font-size:16px;white-space:nowrap}
+.ttl small{display:block;font-weight:500;font-size:11.5px;color:var(--mut);line-height:1.1}
+.sp{flex:1}
+.seg{display:inline-flex;background:var(--field);border:1px solid var(--bd);border-radius:8px;padding:2px;gap:2px}
+.seg button{border:0;background:transparent;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--mut);white-space:nowrap}
+.seg button.on{background:var(--a);color:#fff}
+[data-theme=dark] .seg button.on{color:#08201f}
+.icon{width:34px;height:34px;border:1px solid var(--bd);border-radius:8px;background:var(--field);cursor:pointer;display:grid;place-items:center}
+.icon svg{width:18px;height:18px}
+.btn{border:1px solid var(--bd);background:var(--field);border-radius:8px;padding:5px 11px;cursor:pointer;font-weight:600;font-size:13px}
+.btn:hover,.icon:hover{border-color:var(--a)}
+/* layout */
+.layout{display:grid;grid-template-columns:430px minmax(0,1.12fr) minmax(0,1fr);gap:10px;padding:10px;height:calc(100vh - 48px);height:calc(100dvh - 48px)}
+.col{display:flex;flex-direction:column;gap:10px;min-height:0;min-width:0}
+.col.in{overflow:auto;padding-right:2px}
+.pn{background:var(--panel);border:1px solid var(--bd);border-radius:10px;padding:9px 11px;box-shadow:var(--sh);min-width:0}
+.pn h2{font-size:13px;margin:0 0 7px;text-transform:uppercase;letter-spacing:.05em;color:var(--a);display:flex;align-items:center;gap:8px}
+.pn h2 .sp{flex:1}
+.f3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px 8px}
+.f2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 8px}
+.fd{display:flex;flex-direction:column;gap:2px;min-width:0}
+.fd>label,.lbl{font-size:12.5px;font-weight:600;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s2{grid-column:span 2}.s3{grid-column:1/-1}
+input[type=number],select{height:31px;width:100%;border:1px solid var(--bd);border-radius:7px;background:var(--field);padding:0 8px;font-size:14px;min-width:0}
+input:focus,select:focus{outline:2px solid color-mix(in srgb,var(--a) 35%,transparent);border-color:var(--a)}
+input:disabled,select:disabled{opacity:.45}
+.chk{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chk input{width:16px;height:16px;accent-color:var(--a);margin:0}
+.hint{font-size:12px;color:var(--mut);margin-top:5px}
+.hid{display:none!important}
+.dis{opacity:.45;pointer-events:none}
+.status{font-size:12.5px;padding:6px 9px;border-radius:7px;background:var(--a2);color:var(--ink)}
+.status.e{background:color-mix(in srgb,var(--bad) 18%,transparent)}
+/* results */
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.card{border:1px solid var(--bd);background:var(--field);border-radius:8px;padding:6px 9px;min-width:0}
+.card .k{font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .val{font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .sub{font-size:12px;color:var(--mut);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card.w2{grid-column:span 2}.card.hl{border-color:var(--a);background:var(--a2)}
+.bdg{display:inline-block;padding:0 6px;border-radius:99px;font-size:11.5px;font-weight:700;margin-left:4px}
+.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,transparent)}.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 15%,transparent)}.err{color:var(--bad);background:color-mix(in srgb,var(--bad) 15%,transparent)}
+.tw{overflow:auto;border:1px solid var(--bd);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:4px 8px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--bd)}
+th{position:sticky;top:0;background:var(--field);font-size:12px;color:var(--mut);font-weight:700;z-index:1}
+th:first-child,td:first-child{text-align:left}
+tbody tr:last-child td{border-bottom:0}
+#rows tr{cursor:pointer}#rows tr:hover td{background:color-mix(in srgb,var(--a) 7%,transparent)}
+#rows tr.sel td{background:var(--a2);font-weight:700}
+td.t25{font-weight:700}
+.grow{flex:1;min-height:120px;display:flex;flex-direction:column}
+.grow .tw{flex:1}
+/* charts */
+.ch{flex:1;display:flex;flex-direction:column;min-height:200px}
+.chhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.chhead h2{margin:0}
+.chopts{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12.5px}
+.chopts select{height:26px;width:auto;font-size:13px;padding:0 4px}
+.cv{flex:1;position:relative;min-height:150px}
+.cv canvas{position:absolute;inset:0;width:100%;height:100%}
+.leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--mut);margin-top:3px}
+.leg i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:4px}
+.msg{position:absolute;inset:0;display:grid;place-items:center;color:var(--mut);font-size:13px;text-align:center;padding:10px}
+/* responsive */
+@media (max-width:1500px){.layout{grid-template-columns:410px minmax(0,1fr) minmax(0,1fr)}.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:1250px){
+ .layout{height:auto;grid-template-columns:400px minmax(0,1fr)}
+ .col.charts{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr))}
+ .ch{height:330px}.col.in{overflow:visible}.grow{min-height:360px}
+}
+@media (max-width:860px){
+ body{font-size:15px}
+ .bar{height:auto;flex-wrap:wrap;padding:8px 10px;gap:8px;position:sticky;top:0;z-index:5}
+ .ttl{font-size:15px;flex:1}
+ .bar .sp{display:none}
+ .bar .seg.mode{order:5;width:100%;display:flex}.bar .seg.mode button{flex:1;padding:7px 4px}.seg .l{display:none}
+ .layout{display:flex;flex-direction:column;padding:8px;gap:8px}
+ .col.charts{display:flex}
+ .f3{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .s2{grid-column:span 1}.f3 .s3,.f3 .wide2{grid-column:1/-1}
+ input[type=number],select{height:40px;font-size:16px}
+ .fd>label,.lbl{font-size:13px;white-space:normal}
+ .chk{font-size:14px}.chk input{width:20px;height:20px}
+ .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .card .val{font-size:17px}
+ .ch{height:300px;min-height:300px}
+ .grow{min-height:0}.grow .tw{max-height:420px}
+ table{font-size:13.5px}
+ .seg button{padding:6px 10px;font-size:14px}
+}
+@media print{.bar .icon,.bar .btn{display:none}}
+</style>
+</head>
+<body>
+<header class="bar">
+ <svg class="logo" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="6" fill="var(--a)"/><path d="M14 3v4M14 21v4M10.5 7h7v5h-7zM10.5 16h7v5h-7zM14 12v4M8 14h-2M20 14h2" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+ <div class="ttl">Делитель напряжения E24 / E6<small>допуски · ТКС · ТКЕ · Vfb · нагрузка · RC/АЧХ</small></div>
+ <div class="sp"></div>
+ <div class="seg mode" id="modeSeg"><button data-v="vin" class="on"><span class="l">Известно </span>Vin → <span class="l">ищем </span>Vout</button><button data-v="vfb"><span class="l">Известно </span>Vout (Vfb) → <span class="l">ищем </span>Vin</button></div>
+ <div class="seg" id="unitSeg" title="Единицы напряжения"><button data-v="V" class="on">V</button><button data-v="mV">mV</button></div>
+ <button class="btn" id="csv" title="Экспорт таблиц в CSV (;, UTF-8 BOM)">CSV</button>
+ <button class="btn" id="reset" title="Сбросить исходные данные">Сброс</button>
+ <button class="icon" id="theme" aria-label="Переключить тему" title="Светлая / тёмная тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+</header>
+
+<main class="layout">
+<!-- ============ ВВОД ============ -->
+<section class="col in">
+ <div class="pn">
+  <h2>Напряжения</h2>
+  <div class="f3">
+   <div class="fd"><label for="vin" id="lVin">Vin, V</label><input id="vin" type="number" step="0.05" min="0" value="12"></div>
+   <div class="fd"><label for="vout" id="lVout">Желаемое Vout, V</label><input id="vout" type="number" step="0.05" min="0" value="5"></div>
+   <div class="fd"><label class="lbl" id="lRef">Точность Vin</label>
+    <div class="seg" id="refSeg" style="height:31px"><button data-v="pct" class="on">±%</button><button data-v="lim">min/max</button></div></div>
+   <div class="fd" id="fRefPct"><label for="refPct" id="lRefPct">Отклонение Vin, ±%</label><input id="refPct" type="number" step="0.1" min="0" value="0"></div>
+   <div class="fd hid" id="fRefMin"><label for="refMin" id="lRefMin">Vin.min, V</label><input id="refMin" type="number" step="0.05" min="0" value="11.4"></div>
+   <div class="fd hid" id="fRefNom"><label for="refNom" id="lRefNom">Vin.nom, V</label><input id="refNom" type="number" step="0.05" min="0" value="12"></div>
+   <div class="fd hid" id="fRefMax"><label for="refMax" id="lRefMax">Vin.max, V</label><input id="refMax" type="number" step="0.05" min="0" value="12.6"></div>
+  </div>
+  <div class="hint" id="refHint"></div>
+ </div>
+
+ <div class="pn">
+  <h2>Резисторы E24</h2>
+  <div class="f3">
+   <div class="fd s2"><label for="decades">Декады ряда</label><select id="decades"><option value="1">1 Ω … 9,1 MΩ</option><option value="10">10 Ω … 910 kΩ</option><option value="100" selected>100 Ω … 910 kΩ</option><option value="1000">1 kΩ … 9,1 MΩ</option></select></div>
+   <div class="fd"><label for="topn">Вариантов</label><input id="topn" type="number" min="1" max="30" step="1" value="12"></div>
+   <div class="fd"><label for="rsum">Цель R1+R2, Ω</label><input id="rsum" type="number" min="2" step="100" value="10000"></div>
+   <div class="fd"><label for="tol1">Допуск R1</label><select id="tol1"><option value="0.05">±0,05 %</option><option value="0.1">±0,1 %</option><option value="0.5">±0,5 %</option><option value="1" selected>±1 %</option><option value="2">±2 %</option><option value="5">±5 %</option></select></div>
+   <div class="fd"><label for="tol2">Допуск R2</label><select id="tol2"><option value="0.05">±0,05 %</option><option value="0.1">±0,1 %</option><option value="0.5">±0,5 %</option><option value="1" selected>±1 %</option><option value="2">±2 %</option><option value="5">±5 %</option></select></div>
+   <div class="fd"><label class="lbl">&nbsp;</label><label class="chk" title="Одинаковый допуск и ТКС у R1 и R2"><input id="same" type="checkbox" checked> R2 = R1</label></div>
+   <div class="fd"><label for="tcr1">ТКС R1, ppm/°C</label><select id="tcr1"><option>15</option><option>50</option><option>75</option><option selected>100</option><option>200</option><option>500</option></select></div>
+   <div class="fd"><label for="tcr2">ТКС R2, ppm/°C</label><select id="tcr2"><option>15</option><option>50</option><option>75</option><option selected>100</option><option>200</option><option>500</option></select></div>
+  </div>
+ </div>
+
+ <div class="pn">
+  <h2>Нагрузка <span class="sp"></span><label class="chk"><input id="loadOn" type="checkbox"> учитывать</label></h2>
+  <div class="f3" id="loadBox">
+   <div class="fd"><label for="rload">Rн, Ω</label><input id="rload" type="number" min="1" step="1000" value="100000"></div>
+   <div class="fd s2"><label class="lbl">&nbsp;</label><div class="hint" style="margin:6px 0 0">Rн ∥ R2 (выход → GND): R↓ = R2 ∥ Rн</div></div>
+  </div>
+ </div>
+
+ <div class="pn">
+  <h2>Конденсатор E6 / RC-модель <span class="sp"></span><label class="chk"><input id="rcOn" type="checkbox" checked> включить</label></h2>
+  <div id="rcBox">
+  <div class="f3">
+   <div class="fd"><label for="branch">Положение C</label><select id="branch"><option value="r1">C ∥ R1</option><option value="r2">C ∥ R2</option><option value="load">C ∥ Rн</option></select></div>
+   <div class="fd s2"><label for="xref">Условие |Xc| = R</label><select id="xref"><option value="self">R выбранного резистора</option><option value="eq">Req, видимое C (полюс)</option></select></div>
+   <div class="fd s3"><label class="lbl">Задание конденсатора</label><div class="seg" id="cSeg" style="display:flex"><button data-v="fc" class="on" style="flex:1">Ввод Fc → расчёт C (E6)</button><button data-v="c" style="flex:1">Выбор C (E6) → Fc</button></div></div>
+   <div class="fd" id="fFc"><label for="fc">Целевая Fc, кГц</label><input id="fc" type="number" min="0" step="0.1" value="1"></div>
+   <div class="fd hid" id="fCe6"><label for="ce6">C, E6</label><select id="ce6"><option>1.0</option><option>1.5</option><option selected>2.2</option><option>3.3</option><option>4.7</option><option>6.8</option></select></div>
+   <div class="fd hid" id="fCdec"><label for="cdec">Множитель</label><select id="cdec"><option value="1e-12">pF</option><option value="1e-11">×10 pF</option><option value="1e-10">×100 pF</option><option value="1e-9">nF</option><option value="1e-8" selected>×10 nF</option><option value="1e-7">×100 nF</option><option value="1e-6">µF</option><option value="1e-5">×10 µF</option><option value="1e-4">×100 µF</option></select></div>
+   <div class="fd"><label for="ctol">Допуск C</label><select id="ctol"><option value="1">±1 %</option><option value="2">±2 %</option><option value="5">±5 %</option><option value="10" selected>±10 %</option><option value="20">±20 %</option></select></div>
+   <div class="fd"><label for="diel">Диэлектрик</label><select id="diel"><option value="c0g">C0G / NP0</option><option value="x7r" selected>X7R</option></select></div>
+   <div class="fd"><label for="tcc">ТКЕ, ppm/°C</label><select id="tcc"></select></div>
+   <div class="fd"><label for="fan">f анализа, кГц</label><input id="fan" type="number" min="0" step="0.1" value="1"></div>
+  </div>
+  <div class="hint" id="rcHint"></div>
+  </div>
+ </div>
+ <div class="status" id="status">Готово.</div>
+</section>
+
+<!-- ============ РЕЗУЛЬТАТЫ ============ -->
+<section class="col out">
+ <div class="pn"><h2>Выбранная пара <span class="sp"></span><span style="text-transform:none;letter-spacing:0;color:var(--mut);font-weight:500;font-size:12px">клик по строке таблицы — выбрать другую</span></h2><div class="cards" id="cards"></div></div>
+ <div class="pn"><h2 id="wcTitle">Worst-case по температуре</h2>
+  <div class="tw"><table><thead id="tHead"></thead><tbody id="temps"></tbody></table></div>
+  <div class="hint" id="wcHint"></div>
+ </div>
+ <div class="pn grow"><h2>Пары E24</h2><div class="tw"><table><thead id="pHead"></thead><tbody id="rows"></tbody></table></div></div>
+</section>
+
+<!-- ============ ГРАФИКИ ============ -->
+<section class="col charts">
+ <div class="pn ch">
+  <div class="chhead"><h2>АЧХ при температурах</h2></div>
+  <div class="cv"><canvas id="cvFam"></canvas><div class="msg hid" id="mFam">RC-модель выключена</div></div>
+  <div class="leg" id="legFam"></div>
+ </div>
+ <div class="pn ch">
+  <div class="chhead"><h2>АЧХ: worst-case</h2><div class="chopts"><label>T <select id="tsel"><option>-55</option><option>-40</option><option>-20</option><option>0</option><option selected>25</option><option>55</option><option>85</option></select> °C</label></div></div>
+  <div class="cv"><canvas id="cvWc"></canvas><div class="msg hid" id="mWc">RC-модель выключена</div></div>
+  <div class="leg" id="legWc"></div>
+ </div>
+ <div class="pn ch">
+  <div class="chhead"><h2 id="vtTitle">Vout(T)</h2>
+   <div class="chopts">
+    <label class="chk"><input id="uTol" type="checkbox" checked> допуски R/C</label>
+    <label class="chk"><input id="uTcr" type="checkbox" checked> ТКС</label>
+    <label class="chk"><input id="uTcc" type="checkbox" checked> ТКЕ</label>
+    <label class="chk"><input id="uRef" type="checkbox" checked> <span id="lURef">Vin ±</span></label>
+    <select id="vtF" title="Частота для Vout(T)"><option value="dc">DC</option><option value="fan">f анализа</option></select>
+   </div></div>
+  <div class="cv"><canvas id="cvVt"></canvas></div>
+  <div class="leg" id="legVt"></div>
+ </div>
+</section>
+</main>
+
+<script>
+"use strict";
+const E24=[1,1.1,1.2,1.3,1.5,1.6,1.8,2,2.2,2.4,2.7,3,3.3,3.6,3.9,4.3,4.7,5.1,5.6,6.2,6.8,7.5,8.2,9.1];
+const E6=[1,1.5,2.2,3.3,4.7,6.8];
+const TS=[-55,-40,-20,0,25,55,85];
+const TCOL=['#2c3fb0','#3f74d6','#1ea0c8','#169c86','INK','#e08a1e','#cc2f2a'];
+const TCC={c0g:[30],x7r:[500,1000,1500,2000]};
+const $=id=>document.getElementById(id);
+const S={mode:'vin',unit:'V',ref:'pct',cm:'fc',selKey:null,list:[],cur:null};
+const STORE='vdiv-e24e6-v2';
+
+/* ---------- formatting ---------- */
+const dec=s=>s.replace('.',',');
+function trim(s){return s.indexOf('.')<0?s:s.replace(/0+$/,'').replace(/\.$/,'')}
+function fr(r){if(!isFinite(r))return'∞';if(r>=1e6)return dec(trim((r/1e6).toFixed(3)))+' MΩ';if(r>=1e3)return dec(trim((r/1e3).toFixed(3)))+' kΩ';return dec(trim(r.toFixed(2)))+' Ω'}
+function fcap(c){if(c>=1e-6)return dec(trim((c*1e6).toFixed(3)))+' µF';if(c>=1e-9)return dec(trim((c*1e9).toFixed(3)))+' nF';return dec(trim((c*1e12).toFixed(2)))+' pF'}
+function ffr(f){if(!isFinite(f))return'—';if(f>=1e6)return dec(trim((f/1e6).toFixed(3)))+' MHz';if(f>=1e3)return dec(trim((f/1e3).toFixed(3)))+' kHz';return dec(trim(f.toFixed(2)))+' Hz'}
+function fv(v,d){const m=S.unit==='mV'?1e3:1,n=v*m;if(d==null)d=Math.abs(n)>=1000?2:Math.abs(n)>=100?3:Math.abs(n)>=10?4:5;return dec(n.toFixed(d))+' '+S.unit}
+function fp(v,d=3){return(v>=0?'+':'−')+dec(Math.abs(v).toFixed(d))+' %'}
+function fI(i){return i>=1e-3?dec(trim((i*1e3).toFixed(3)))+' mA':dec(trim((i*1e6).toFixed(2)))+' µA'}
+function fP(p){return p>=1?dec(trim(p.toFixed(3)))+' W':p>=1e-3?dec(trim((p*1e3).toFixed(2)))+' mW':dec(trim((p*1e6).toFixed(1)))+' µW'}
+const tS=T=>(T>0?'+':T<0?'−':'')+Math.abs(T);
+const par=(a,b)=>!isFinite(a)?b:!isFinite(b)?a:a*b/(a+b);
+
+/* ---------- complex ---------- */
+const C=(re,im=0)=>({re,im});
+const cadd=(a,b)=>C(a.re+b.re,a.im+b.im);
+const cmul=(a,b)=>C(a.re*b.re-a.im*b.im,a.re*b.im+a.im*b.re);
+const cdiv=(a,b)=>{const d=b.re*b.re+b.im*b.im;return C((a.re*b.re+a.im*b.im)/d,(a.im*b.re-a.re*b.im)/d)};
+const cpar=(a,b)=>cdiv(cmul(a,b),cadd(a,b));
+
+/* ---------- inputs ---------- */
+function num(id){const v=parseFloat(String($(id).value).replace(',','.'));return isFinite(v)?v:NaN}
+function inp(){
+ const sc=S.unit==='mV'?1e-3:1;
+ const x={mode:S.mode,vin:num('vin')*sc,vout:num('vout')*sc,rsum:num('rsum'),topn:Math.max(1,Math.min(30,Math.round(num('topn'))||12)),dec:+$('decades').value,
+  tol1:+$('tol1').value/100,tol2:+$('tol2').value/100,tcr1:+$('tcr1').value,tcr2:+$('tcr2').value,
+  loadOn:$('loadOn').checked,rl:num('rload'),rc:$('rcOn').checked,branch:$('branch').value,xref:$('xref').value,cm:S.cm,
+  fc:num('fc')*1e3,cman:+$('ce6').value*+$('cdec').value,ctol:+$('ctol').value/100,diel:$('diel').value,tcc:+$('tcc').value,fan:num('fan')*1e3};
+ x.known=x.mode==='vin'?x.vin:x.vout; x.target=x.mode==='vin'?x.vout:x.vin;
+ if(S.ref==='pct'){const p=(num('refPct')||0)/100;x.ref={min:x.known*(1-p),nom:x.known,max:x.known*(1+p)}}
+ else x.ref={min:num('refMin')*sc,nom:x.known,max:num('refMax')*sc};
+ if(!x.loadOn)x.rl=Infinity;
+ return x;
+}
+function validate(x){
+ if(!(x.vin>0&&x.vout>0))return'Напряжения должны быть больше нуля.';
+ if(!(x.vin>x.vout))return'Требуется Vin > Vout.';
+ if(!(x.rsum>=2))return'Цель R1+R2 должна быть не менее 2 Ω.';
+ if(x.loadOn&&!(x.rl>0))return'Rн должно быть больше нуля.';
+ if(!(x.ref.min>0&&x.ref.min<=x.ref.nom&&x.ref.nom<=x.ref.max))return'Проверьте границы: требуется min ≤ nom ≤ max, все > 0.';
+ if(x.rc){if(x.cm==='fc'&&!(x.fc>0))return'Целевая Fc должна быть больше нуля.';if(!(x.fan>0))return'Частота анализа должна быть больше нуля.'}
+ return null;
+}
+
+/* ---------- model ---------- */
+function series(d){const ds=d===1?[1,10,100,1e3,1e4,1e5,1e6]:d===10?[10,100,1e3,1e4,1e5]:d===100?[100,1e3,1e4,1e5]:[1e3,1e4,1e5,1e6];return ds.flatMap(k=>E24.map(v=>+(v*k).toPrecision(3)))}
+const kdc=(r1,r2,rl)=>{const lo=par(r2,rl);return lo/(r1+lo)};
+const sought=(x,k,vref)=>x.mode==='vin'?vref*k:vref/k;
+/* сопротивление для условия |Xc| = R */
+function rx(x,r1,r2,rl){
+ if(x.xref==='self')return x.branch==='r1'?r1:x.branch==='r2'?r2:(isFinite(rl)?rl:r2);
+ return x.branch==='r1'?par(r1,par(r2,rl)):par(r1,par(r2,rl));
+}
+function nearE6(c){let best=1e-12,be=1e9;for(let d=-12;d<=-4;d++)for(const m of E6){const v=m*Math.pow(10,d),e=Math.abs(Math.log(v/c));if(e<be){be=e;best=v}}return best}
+function capFor(x,r1,r2){
+ const R=rx(x,r1,r2,x.rl);let c,ci=null;
+ if(x.cm==='fc'){ci=1/(2*Math.PI*x.fc*R);c=nearE6(ci)}else c=x.cman;
+ const req=par(r1,par(r2,x.rl));
+ return{c,ci,R,fx:1/(2*Math.PI*R*c),fp:1/(2*Math.PI*req*c),req};
+}
+/* передаточная функция H = Vout/Vin */
+function H(x,r1,r2,rl,c,f){
+ if(!x.rc||!(c>0))return C(kdc(r1,r2,rl));
+ const zc=C(0,-1/(2*Math.PI*f*c));
+ let a=C(r1),b=C(r2),l=isFinite(rl)?C(rl):null;
+ if(x.branch==='r1')a=cpar(a,zc);
+ else if(x.branch==='r2')b=cpar(b,zc);
+ else{ if(l)l=cpar(l,zc); else b=cpar(b,zc); }
+ const lo=l?cpar(b,l):b;return cdiv(lo,cadd(a,lo));
+}
+const mag=z=>Math.hypot(z.re,z.im), ph=z=>Math.atan2(z.im,z.re)*180/Math.PI;
+/* температурные модели */
+const rT=(r,tcr,T,s=1)=>r*(1+s*tcr*1e-6*(T-25));
+function cNom(x,c,T){return x.diel==='c0g'?c:c*(1-x.tcc*1e-6*Math.abs(T-25))}
+function cCorner(x,c,T,s){return c*(1+s*x.tcc*1e-6*Math.abs(T-25))}
+/* перебор углов */
+function corners(x,z,T,f,fl){
+ // fl:{tol,tcr,tcc,ref}; f: null → DC
+ const st=fl.tol?[-1,1]:[0], sc=fl.tcr?[-1,1]:[0], sk=fl.tcc?[-1,1]:[0];
+ const refs=fl.ref?[x.ref.min,x.ref.max]:[x.ref.nom];
+ const useC=f!=null&&x.rc;
+ const cvals=[];
+ for(const a of (useC?st:[0]))for(const b of (useC?sk:[0]))cvals.push(useC?(fl.tcc?cCorner(x,z.c,T,b):z.c)*(1+a*x.ctol):0);
+ let mn=Infinity,mx=-Infinity;
+ for(const a1 of st)for(const b1 of sc)for(const a2 of st)for(const b2 of sc){
+  const r1=z.r1*(1+a1*x.tol1)*(fl.tcr?(1+b1*x.tcr1*1e-6*(T-25)):1);
+  const r2=z.r2*(1+a2*x.tol2)*(fl.tcr?(1+b2*x.tcr2*1e-6*(T-25)):1);
+  for(const c of cvals){
+   const k=useC?mag(H(x,r1,r2,x.rl,c,f)):kdc(r1,r2,x.rl);
+   for(const v of refs){const s=sought(x,k,v);if(s<mn)mn=s;if(s>mx)mx=s}
+  }}
+ return[mn,mx];
+}
+function nominal(x,z,T,f,fl){
+ const r1=fl.tcr?rT(z.r1,x.tcr1,T):z.r1, r2=fl.tcr?rT(z.r2,x.tcr2,T):z.r2;
+ const k=(f!=null&&x.rc)?mag(H(x,r1,r2,x.rl,fl.tcc?cNom(x,z.c,T):z.c,f)):kdc(r1,r2,x.rl);
+ return sought(x,k,x.ref.nom);
+}
+/* ---------- compute ---------- */
+function compute(){
+ saveState();
+ const x=inp(),err=validate(x);
+ const st=$('status');
+ if(err){st.textContent=err;st.className='status e';return}
+ const ser=series(x.dec),all=[];
+ for(const r1 of ser)for(const r2 of ser){
+  const k=kdc(r1,r2,x.rl),v=sought(x,k,x.known),e=(v-x.target)/x.target*100;
+  all.push({r1,r2,k,v,e,score:Math.abs(e)+.35*Math.abs(r1+r2-x.rsum)/x.rsum});
+ }
+ all.sort((a,b)=>a.score-b.score);
+ const list=all.slice(0,x.topn);
+ for(const z of list){
+  z.lo=par(z.r2,x.rl);
+  z.vinA=x.mode==='vin'?x.known:z.v; z.voutA=x.mode==='vin'?z.v:x.known;
+  z.i=z.vinA/(z.r1+z.lo);
+  if(x.rc)Object.assign(z,capFor(x,z.r1,z.r2));
+  const fl={tol:1,tcr:1,tcc:1,ref:1};let mn=Infinity,mx=-Infinity;
+  for(const T of TS){const[a,b]=corners(x,z,T,null,fl);mn=Math.min(mn,a);mx=Math.max(mx,b)}
+  z.wmin=mn;z.wmax=mx;
+ }
+ S.list=list;S.x=x;
+ let idx=list.findIndex(z=>z.r1+'/'+z.r2===S.selKey);if(idx<0)idx=0;
+ select(idx,false);
+ st.className='status';
+ st.textContent=`Перебрано ${all.length} пар E24. Лучшая: R1 = ${fr(list[0].r1)}, R2 = ${fr(list[0].r2)}, отклонение ${fp(list[0].e)}.`+(x.rc&&x.cm==='fc'?` Fc = ${dec(String(num('fc')))} кГц = ${ffr(x.fc)}.`:'');
+}
+function select(i,keep=true){
+ const z=S.list[i];if(!z)return;S.cur=z;S.selKey=z.r1+'/'+z.r2;
+ renderPairs();renderCards();renderTemps();drawAll();
+}
+
+/* ---------- render ---------- */
+function grade(e){e=Math.abs(e);return e<=1?['ok','отлично']:e<=5?['warn','допустимо']:['err','велико']}
+function renderCards(){
+ const x=S.x,z=S.cur,vin=x.mode==='vin';
+ const g=grade(z.e),sName=vin?'Vout':'Vin';
+ const pr1=Math.pow(z.i*z.r1,2)/z.r1, vlo=z.i*z.lo, pr2=vlo*vlo/z.r2;
+ const cards=[
+  ['R1 (верх)',fr(z.r1),`±${dec(String(x.tol1*100))} % · ${x.tcr1} ppm/°C`],
+  ['R2 (низ)',fr(z.r2),`±${dec(String(x.tol2*100))} % · ${x.tcr2} ppm/°C`],
+  [sName+' расчётное',fv(z.v),`цель ${fv(x.target)}`,1],
+  ['Отклонение',fp(z.e)+`<span class="bdg ${g[0]}">${g[1]}</span>`,'относительно желаемого'],
+  ['Worst-case '+sName,`${fv(z.wmin,4)} … ${fv(z.wmax,4)}`.replace(/ (m?V) …/,' …'),`${fp((z.wmin/z.v-1)*100,2)} / ${fp((z.wmax/z.v-1)*100,2)} · −55…+85 °C, допуски, ТКС, ${x.mode==='vin'?'Vin':'Vfb'}`,2],
+  ['R↓ = R2'+(x.loadOn?' ∥ Rн':''),fr(z.lo),`R1+R2 = ${fr(z.r1+z.r2)}`],
+  ['Ток делителя',fI(z.i),`P(R1) ${fP(pr1)} · P(R2) ${fP(pr2)}`],
+ ];
+ if(x.rc){
+  const Hn=H(x,z.r1,z.r2,x.rl,z.c,x.fan);
+  cards.push(['C '+({r1:'∥ R1',r2:'∥ R2',load:'∥ Rн'})[x.branch]+' (E6)',fcap(z.c),(z.ci?`расч. ${fcap(z.ci)} · `:'')+`|Xc|=${fr(z.R)} при ${ffr(z.fx)}`]);
+  cards.push(['Частоты RC',ffr(z.fx),`полюс по Req ${fr(z.req)}: ${ffr(z.fp)}`]);
+  cards.push([`|H| на ${ffr(x.fan)}`,dec((20*Math.log10(mag(Hn))).toFixed(2))+' dB',`|H| = ${dec(mag(Hn).toFixed(5))} · φ = ${dec(ph(Hn).toFixed(2))}°`]);
+ } else cards.push(['Kдел DC',dec(z.k.toFixed(6)),`1/K = ${dec((1/z.k).toFixed(5))}`]);
+ $('cards').innerHTML=cards.map(c=>`<div class="card${c[3]===1?' hl':c[3]===2?' w2':''}"><div class="k">${c[0]}</div><div class="val">${c[1]}</div><div class="sub" title="${c[2]}">${c[2]}</div></div>`).join('');
+}
+function renderTemps(){
+ const x=S.x,z=S.cur,sName=x.mode==='vin'?'Vout':'Vin',refN=x.mode==='vin'?'Vin':'Vfb';
+ $('wcTitle').textContent=`Worst-case ${sName} по температуре (DC)`;
+ $('tHead').innerHTML=`<tr><th>T, °C</th><th>R1(T)</th><th>R2(T)</th><th>${sName} ном.</th><th>${sName} min</th><th>${sName} max</th><th>Уход ном. от +25</th><th>Разброс −/+</th></tr>`;
+ const fl={tol:1,tcr:1,tcc:1,ref:1},n25=nominal(x,z,25,null,fl);
+ S.temps=TS.map(T=>{const n=nominal(x,z,T,null,fl),[a,b]=corners(x,z,T,null,fl);return{T,r1:rT(z.r1,x.tcr1,T),r2:rT(z.r2,x.tcr2,T),n,a,b,d:(n/n25-1)*100,lo:(a/n-1)*100,hi:(b/n-1)*100}});
+ $('temps').innerHTML=S.temps.map(t=>`<tr><td class="${t.T===25?'t25':''}">${tS(t.T)}</td><td>${fr(t.r1)}</td><td>${fr(t.r2)}</td><td class="${t.T===25?'t25':''}">${fv(t.n)}</td><td>${fv(t.a)}</td><td>${fv(t.b)}</td><td>${fp(t.d,4)}</td><td>${fp(t.lo,2)} / ${fp(t.hi,2)}</td></tr>`).join('');
+ $('wcHint').textContent=`${refN}: ${fv(x.ref.min)} … ${fv(x.ref.max)} (ном. ${fv(x.ref.nom)}). Номинал при T — ТКС обоих резисторов со знаком «+»; границы — независимые ± допуски и ± ТКС каждого плеча, крайние ${refN}. Конденсатор на DC не влияет.`;
+}
+function renderPairs(){
+ const x=S.x,sName=x.mode==='vin'?'Vout':'Vin';
+ $('pHead').innerHTML=`<tr><th>#</th><th>R1</th><th>R2</th><th>R↓</th><th>Vin</th><th>Vout</th><th>Откл.</th><th>R1+R2</th><th>I</th><th>WC ${sName} min…max</th>${x.rc?'<th>C E6</th><th>f(|Xc|=R)</th>':''}</tr>`;
+ $('rows').innerHTML=S.list.map((z,i)=>`<tr data-i="${i}" class="${z===S.cur?'sel':''}"><td>${i+1}</td><td>${fr(z.r1)}</td><td>${fr(z.r2)}</td><td>${fr(z.lo)}</td><td>${fv(z.vinA)}</td><td>${fv(z.voutA)}</td><td>${fp(z.e)}</td><td>${fr(z.r1+z.r2)}</td><td>${fI(z.i)}</td><td>${fv(z.wmin,4)} … ${fv(z.wmax,4)}</td>${x.rc?`<td>${fcap(z.c)}</td><td>${ffr(z.fx)}</td>`:''}</tr>`).join('');
+}
+
+/* ---------- charts ---------- */
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function prep(id){
+ const cv=$(id),box=cv.parentElement,r=window.devicePixelRatio||1,w=box.clientWidth,h=box.clientHeight;
+ cv.width=Math.max(1,w*r);cv.height=Math.max(1,h*r);const g=cv.getContext('2d');g.setTransform(r,0,0,r,0,0);g.clearRect(0,0,w,h);return{g,w,h};
+}
+function niceStep(range,n){const raw=range/n,p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;return(m<1.5?1:m<3?2:m<7?5:10)*p}
+function frame(g,w,h,o){
+ const m={l:54,r:12,t:10,b:30};const ink=css('--mut'),grid=css('--grid');
+ const fs=w<420?11:12;g.font=`${fs}px "Segoe UI",system-ui,sans-serif`;
+ const lx0=o.xlog?Math.log10(o.x0):o.x0,lx1=o.xlog?Math.log10(o.x1):o.x1;
+ const X=v=>m.l+((o.xlog?Math.log10(v):v)-lx0)/(lx1-lx0)*(w-m.l-m.r);
+ const Y=v=>h-m.b-(v-o.y0)/(o.y1-o.y0)*(h-m.t-m.b);
+ g.strokeStyle=grid;g.fillStyle=ink;g.lineWidth=1;
+ const ys=niceStep(o.y1-o.y0,5),yd=Math.max(0,-Math.floor(Math.log10(ys)));
+ g.textAlign='right';g.textBaseline='middle';
+ for(let v=Math.ceil(o.y0/ys)*ys;v<=o.y1+1e-12;v+=ys){const y=Y(v);g.beginPath();g.moveTo(m.l,y);g.lineTo(w-m.r,y);g.stroke();g.fillText(dec((Math.abs(v)<ys/1e6?0:v).toFixed(yd)),m.l-5,y)}
+ g.textAlign='center';g.textBaseline='top';
+ if(o.xlog){for(let e=Math.ceil(lx0);e<=Math.floor(lx1);e++){const v=Math.pow(10,e),xx=X(v);g.beginPath();g.moveTo(xx,m.t);g.lineTo(xx,h-m.b);g.stroke();g.fillText(ffr(v).replace(' ',''),xx,h-m.b+4);
+   for(let k=2;k<10;k++){const vv=k*v;if(vv>o.x1)break;const x2=X(vv);g.save();g.globalAlpha=.4;g.beginPath();g.moveTo(x2,m.t);g.lineTo(x2,h-m.b);g.stroke();g.restore()}}}
+ else for(const t of o.xt){const xx=X(t);g.beginPath();g.moveTo(xx,m.t);g.lineTo(xx,h-m.b);g.stroke();g.fillText(tS(t),xx,h-m.b+4)}
+ g.strokeStyle=css('--bd');g.strokeRect(m.l,m.t,w-m.l-m.r,h-m.t-m.b);
+ g.save();g.translate(12,(m.t+h-m.b)/2);g.rotate(-Math.PI/2);g.textAlign='center';g.textBaseline='middle';g.fillText(o.yl,0,0);g.restore();
+ g.textAlign='right';g.textBaseline='bottom';g.fillText(o.xl,w-m.r,h-1);
+ return{X,Y,m};
+}
+function line(g,P,col,wd,dash){g.beginPath();P.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.strokeStyle=col;g.lineWidth=wd;g.setLineDash(dash||[]);g.stroke();g.setLineDash([])}
+function band(g,U,L){g.beginPath();U.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));for(let i=L.length-1;i>=0;i--)g.lineTo(L[i][0],L[i][1]);g.closePath();g.fillStyle=css('--band');g.fill()}
+function yr(vals,minSpan,padF=.12){let a=Math.min(...vals),b=Math.max(...vals);if(b-a<minSpan){const c=(a+b)/2;a=c-minSpan/2;b=c+minSpan/2}const p=(b-a)*padF;return[a-p,b+p]}
+function freqs(x,z){const f0=z.fx||1e3,n=160,a=Math.log10(f0)-3,b=Math.log10(f0)+3;return Array.from({length:n},(_,i)=>Math.pow(10,a+(b-a)*i/(n-1)))}
+function tcol(i){return TCOL[i]==='INK'?css('--ink'):TCOL[i]}
+function drawFam(){
+ const x=S.x,z=S.cur;$('mFam').classList.toggle('hid',x.rc);
+ const{g,w,h}=prep('cvFam');if(!x.rc){$('legFam').innerHTML='';return}
+ const F=freqs(x,z),D=TS.map(T=>F.map(f=>20*Math.log10(mag(H(x,rT(z.r1,x.tcr1,T),rT(z.r2,x.tcr2,T),x.rl,cNom(x,z.c,T),f))))),all=D.flat();
+ const[y0,y1]=yr(all,1);const A=frame(g,w,h,{xlog:1,x0:F[0],x1:F[F.length-1],y0,y1,yl:'|H|, dB',xl:'f'});
+ D.forEach((d,i)=>line(g,d.map((v,j)=>[A.X(F[j]),A.Y(v)]),tcol(i),i===4?2.2:1.6));
+ line(g,[[A.X(z.fx),A.m.t],[A.X(z.fx),h-A.m.b]],css('--mut'),1,[4,4]);
+ $('legFam').innerHTML=TS.map((T,i)=>`<span><i style="background:${tcol(i)}"></i>${tS(T)} °C</span>`).join('')+`<span>пунктир — ${ffr(z.fx)}</span>`;
+}
+function drawWc(){
+ const x=S.x,z=S.cur;$('mWc').classList.toggle('hid',x.rc);
+ const{g,w,h}=prep('cvWc');if(!x.rc){$('legWc').innerHTML='';return}
+ const T=+$('tsel').value,F=freqs(x,z),fl={tol:1,tcr:1,tcc:1,ref:0};
+ const N=[],L=[],U=[];
+ for(const f of F){
+  N.push(20*Math.log10(mag(H(x,rT(z.r1,x.tcr1,T),rT(z.r2,x.tcr2,T),x.rl,cNom(x,z.c,T),f))));
+  // |H| corners: используем режим vin с vref=1
+  const xx=Object.assign({},x,{mode:'vin',ref:{min:1,nom:1,max:1}});const[a,b]=corners(xx,z,T,f,fl);
+  L.push(20*Math.log10(a));U.push(20*Math.log10(b));
+ }
+ const[y0,y1]=yr([...L,...U],1);const A=frame(g,w,h,{xlog:1,x0:F[0],x1:F[F.length-1],y0,y1,yl:'|H|, dB',xl:'f'});
+ const P=a=>a.map((v,j)=>[A.X(F[j]),A.Y(v)]);
+ band(g,P(U),P(L));line(g,P(U),css('--bandl'),1);line(g,P(L),css('--bandl'),1);line(g,P(N),css('--a'),2.2);
+ // максимальная ширина
+ let wmax=0,fw=F[0];for(let i=0;i<F.length;i++){const d=U[i]-L[i];if(d>wmax){wmax=d;fw=F[i]}}
+ $('legWc').innerHTML=`<span><i style="background:${css('--a')}"></i>номинал при ${tS(T)} °C</span><span><i style="background:${css('--bandl')}"></i>границы: допуски R1/R2/C, ±ТКС, ±ТКЕ</span><span>макс. ширина ${dec(wmax.toFixed(2))} dB на ${ffr(fw)}</span>`;
+}
+function drawVt(){
+ const x=S.x,z=S.cur,sName=x.mode==='vin'?'Vout':'Vin';
+ const acSel=$('vtF').value==='fan'&&x.rc,f=acSel?x.fan:null;
+ $('uTcc').disabled=!acSel;$('uTcc').parentElement.classList.toggle('dis',!acSel);
+ $('vtF').disabled=!x.rc;if(!x.rc)$('vtF').value='dc';
+ $('vtTitle').textContent=`${sName}(T)`+(acSel?` на ${ffr(x.fan)}`:' DC');
+ $('lURef').textContent=(x.mode==='vin'?'Vin':'Vfb')+' ±';
+ const fl={tol:$('uTol').checked,tcr:$('uTcr').checked,tcc:acSel&&$('uTcc').checked,ref:$('uRef').checked};
+ const Tg=[];for(let T=-55;T<=85;T+=5)Tg.push(T);
+ const n25=nominal(x,z,25,f,fl),N=[],L=[],U=[];
+ for(const T of Tg){const n=nominal(x,z,T,f,fl),[a,b]=corners(x,z,T,f,fl);N.push((n/n25-1)*100);L.push((a/n25-1)*100);U.push((b/n25-1)*100)}
+ const{g,w,h}=prep('cvVt');
+ const[y0,y1]=yr([...L,...U,...N],.01,.1);
+ const A=frame(g,w,h,{xlog:0,x0:-55,x1:85,xt:TS,y0,y1,yl:`Δ${sName} от +25 °C, %`,xl:'T, °C'});
+ const P=a=>a.map((v,j)=>[A.X(Tg[j]),A.Y(v)]);
+ if(fl.tol||fl.tcr||fl.tcc||fl.ref){band(g,P(U),P(L));line(g,P(U),css('--bandl'),1);line(g,P(L),css('--bandl'),1)}
+ line(g,[[A.m.l,A.Y(0)],[w-A.m.r,A.Y(0)]],css('--mut'),1,[3,4]);
+ line(g,P(N),css('--a'),2.4);
+ g.fillStyle=css('--a');for(const T of TS){const j=Tg.indexOf(T);g.beginPath();g.arc(A.X(T),A.Y(N[j]),2.6,0,7);g.fill()}
+ const j0=0,j1=Tg.length-1,ab=v=>n25*(1+v/100);
+ $('legVt').innerHTML=`<span><i style="background:${css('--a')}"></i>номинал (${fv(n25)} при +25 °C)</span><span><i style="background:${css('--bandl')}"></i>заливка — худшие сочетания отмеченных факторов</span><span>−55 °C: ${fv(ab(L[j0]),4)} … ${fv(ab(U[j0]),4)}</span><span>+85 °C: ${fv(ab(L[j1]),4)} … ${fv(ab(U[j1]),4)}</span>`;
+}
+function drawAll(){if(!S.cur)return;drawFam();drawWc();drawVt()}
+
+/* ---------- UI wiring ---------- */
+function segInit(id,key,cb){$(id).addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(!b)return;setSeg(id,b.dataset.v);S[key]=b.dataset.v;cb&&cb();compute()})}
+function setSeg(id,v){$(id).querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===v))}
+function applyLabels(){
+ const u=S.unit,vin=S.mode==='vin',r=vin?'Vin':'Vfb';
+ $('lVin').textContent=(vin?'Vin':'Желаемое Vin')+', '+u;
+ $('lVout').textContent=(vin?'Желаемое Vout':'Vout = Vfb')+', '+u;
+ $('lRef').textContent='Точность '+r;
+ $('lRefPct').textContent='Отклонение '+r+', ±%';
+ $('lRefMin').textContent=r+'.min, '+u;$('lRefNom').textContent=r+'.nom, '+u;$('lRefMax').textContent=r+'.max, '+u;
+ const p=S.ref==='pct';$('fRefPct').classList.toggle('hid',!p);['fRefMin','fRefNom','fRefMax'].forEach(i=>$(i).classList.toggle('hid',p));
+ $('refNom').value=$(vin?'vin':'vout').value;
+ if(!p){const n=num('refNom'),a=num('refMin'),b=num('refMax');if(!(a>0&&a<=n&&b>=n)){$('refMin').value=+(n*0.98).toPrecision(6);$('refMax').value=+(n*1.02).toPrecision(6)}}
+ $('refHint').textContent=vin?'Точность входного источника Vin: ±% или min/max.':'Точность опорного Vfb: ±% или Vfb.min / nom / max из datasheet.';
+ const st=u==='mV'?'50':'0.05';['vin','vout','refMin','refNom','refMax'].forEach(i=>$(i).step=st);
+}
+function applyRC(){
+ const on=$('rcOn').checked;$('rcBox').classList.toggle('dis',!on);
+ $('loadBox').classList.toggle('dis',!$('loadOn').checked);
+ const fc=S.cm==='fc';$('fFc').classList.toggle('hid',!fc);$('fCe6').classList.toggle('hid',fc);$('fCdec').classList.toggle('hid',fc);
+ const d=$('diel').value,cur=+$('tcc').value,opts=TCC[d];
+ $('tcc').innerHTML=opts.map(v=>`<option value="${v}">${d==='c0g'?'±'+v:v}</option>`).join('');
+ $('tcc').value=opts.includes(cur)?cur:(d==='x7r'?1000:30);
+ const lo=$('branch').querySelector('[value=load]');lo.disabled=!$('loadOn').checked;if(lo.disabled&&$('branch').value==='load')$('branch').value='r2';
+ $('rcHint').textContent=(d==='c0g'?'C0G: номинал без ухода, границы ±30 ppm/°C.':'X7R (оценка): ном. C(1−k|T−25|), границы C(1±k|T−25|); DC bias не учтён.')+' C∥R2 и C∥Rн — один узел, отличие только в R для |Xc| = R.';
+}
+function convUnits(to){
+ if(to===S.unit)return;const k=to==='mV'?1e3:1e-3;
+ ['vin','vout','refMin','refNom','refMax'].forEach(i=>{const v=num(i);if(isFinite(v))$(i).value=+(v*k).toPrecision(10)});
+}
+const IDS=['vin','vout','refPct','refMin','refMax','decades','topn','rsum','tol1','tol2','tcr1','tcr2','same','loadOn','rload','rcOn','branch','xref','fc','ce6','cdec','ctol','diel','tcc','fan','tsel','uTol','uTcr','uTcc','uRef','vtF'];
+function saveState(){try{const o={mode:S.mode,unit:S.unit,ref:S.ref,cm:S.cm,theme:document.documentElement.dataset.theme};IDS.forEach(i=>{const e=$(i);o[i]=e.type==='checkbox'?e.checked:e.value});localStorage.setItem(STORE,JSON.stringify(o))}catch(e){}}
+function loadState(){try{const o=JSON.parse(localStorage.getItem(STORE)||'null');if(!o)return;['mode','unit','ref','cm'].forEach(k=>{if(o[k])S[k]=o[k]});if(o.theme)document.documentElement.dataset.theme=o.theme;
+ if(o.diel)$('diel').value=o.diel;applyRC();
+ IDS.forEach(i=>{if(o[i]===undefined)return;const e=$(i);if(e.type==='checkbox')e.checked=o[i];else e.value=o[i]})}catch(e){}}
+function syncSame(src){if(!$('same').checked)return;if(src==='tol1'||src==='same')$('tol2').value=$('tol1').value;if(src==='tcr1'||src==='same')$('tcr2').value=$('tcr1').value;if(src==='tol2')$('tol1').value=$('tol2').value;if(src==='tcr2')$('tcr1').value=$('tcr2').value}
+
+segInit('modeSeg','mode',applyLabels);
+$('unitSeg').addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(!b)return;convUnits(b.dataset.v);S.unit=b.dataset.v;setSeg('unitSeg',S.unit);applyLabels();compute()});
+segInit('refSeg','ref',applyLabels);
+segInit('cSeg','cm',applyRC);
+document.querySelectorAll('input,select').forEach(el=>el.addEventListener(el.tagName==='SELECT'||el.type==='checkbox'?'change':'input',()=>{
+ const id=el.id;
+ if(['tol1','tol2','tcr1','tcr2','same'].includes(id))syncSame(id);
+ if(id==='refNom'){$(S.mode==='vin'?'vin':'vout').value=el.value}
+ if(id==='vin'||id==='vout')$('refNom').value=$(S.mode==='vin'?'vin':'vout').value;
+ if(['rcOn','loadOn','diel','branch'].includes(id))applyRC();
+ if(['tsel','uTol','uTcr','uTcc','uRef','vtF'].includes(id)){saveState();drawAll();return}
+ compute();
+}));
+$('rows').addEventListener('click',e=>{const tr=e.target.closest('tr[data-i]');if(tr)select(+tr.dataset.i)});
+$('theme').onclick=()=>{const d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';saveState();if(S.cur){renderCards();drawAll()}};
+$('reset').onclick=()=>{try{localStorage.removeItem(STORE)}catch(e){}location.reload()};
+/* CSV: ';', UTF-8 BOM */
+function csvCell(v){v=String(v).replace(/<[^>]+>/g,'');return/[;"\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+$('csv').onclick=()=>{
+ if(!S.cur)return;const x=S.x,rows=[];
+ rows.push(['Делитель E24/E6','Режим',x.mode==='vin'?'Vin → Vout':'Vfb → Vin','Единицы',S.unit]);rows.push([]);
+ rows.push([...$('pHead').querySelectorAll('th')].map(t=>t.textContent));
+ $('rows').querySelectorAll('tr').forEach(tr=>rows.push([...tr.children].map(td=>td.textContent)));rows.push([]);
+ rows.push(['Выбранная пара','R1 = '+fr(S.cur.r1),'R2 = '+fr(S.cur.r2)]);
+ rows.push([...$('tHead').querySelectorAll('th')].map(t=>t.textContent));
+ $('temps').querySelectorAll('tr').forEach(tr=>rows.push([...tr.children].map(td=>td.textContent)));
+ const txt='\ufeff'+rows.map(r=>r.map(csvCell).join(';')).join('\r\n'),name='divider-e24-'+fr(S.cur.r1).replace(/\s/g,'')+'-'+fr(S.cur.r2).replace(/\s/g,'')+'.csv';
+ if(window.AndroidBridge&&AndroidBridge.saveFile){AndroidBridge.saveFile(name,txt);return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/csv;charset=utf-8'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
+};
+let rt;new ResizeObserver(()=>{clearTimeout(rt);rt=setTimeout(drawAll,60)}).observe(document.querySelector('.charts'));
+
+applyRC();loadState();setSeg('modeSeg',S.mode);setSeg('unitSeg',S.unit);setSeg('refSeg',S.ref);setSeg('cSeg',S.cm);applyLabels();applyRC();compute();
+</script>
+</body>
+</html>
