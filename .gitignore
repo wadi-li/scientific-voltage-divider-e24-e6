@@ -1,4 +1,14 @@
+# Сборка Android
 android/out/
-android/assets/index.html
+android/assets/
+
+# Ключи подписи — не публиковать
 *.jks
 *.keystore
+*.p12
+
+# Системные файлы
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
