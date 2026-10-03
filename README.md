@@ -5,8 +5,9 @@
 | | |
 |---|---|
 | **Веб-версия** | https://wadi-li.github.io/scientific-voltage-divider-e24-e6/ |
-| **Android APK** | [dist/voltage-divider-e24-e6-1.0.apk](dist/voltage-divider-e24-e6-1.0.apk) (Android 7.0+, офлайн) |
-| **Версия** | 1.0 — см. [CHANGELOG.md](CHANGELOG.md) |
+| **Android APK** | [dist/voltage-divider-e24-e6-1.1.apk](dist/voltage-divider-e24-e6-1.1.apk) (Android 7.0+, офлайн, ставится поверх 1.0) |
+| **Версия** | 1.1 — см. [CHANGELOG.md](CHANGELOG.md) и [Releases](https://github.com/wadi-li/scientific-voltage-divider-e24-e6/releases) |
+| **Лицензия** | [MIT](LICENSE) |
 
 ![Full HD, светлая тема](docs/screenshots/fullhd-light.png)
 
@@ -23,6 +24,7 @@
 - Графики: АЧХ по температурам; АЧХ worst-case с заливкой при выбранной T; искомое напряжение от температуры (относительная шкала, чекбоксы допусков, ТКС, ТКЕ, Vin/Vfb; DC или частота анализа).
 - Таблица пар E24 (клик — выбор пары), экспорт CSV (`;`, UTF-8 BOM), сохранение введённых данных.
 - Один экран Full HD; вертикальная компоновка для телефона; светлая тема по умолчанию и тёмная по переключателю.
+- На телефоне числа вводятся с цифровой клавиатуры, десятичный разделитель — запятая или точка; элементы управления не меньше 40 px по высоте.
 
 Файл `index.html` полностью автономный: без CDN и внешних шрифтов, графики — встроенный Canvas. Можно открыть локально двойным щелчком.
 
@@ -42,9 +44,10 @@ android/              исходники Android-оболочки WebView
   src/…/MainActivity.java
   res/                иконки, строки, тема
   build.sh            сборка без Gradle
-dist/                 готовые APK
+dist/                 готовые APK (последняя и предыдущие версии)
 docs/                 скриншоты и иконка
 CHANGELOG.md          история версий
+LICENSE               лицензия MIT
 ```
 
 ## Сборка Android
@@ -52,9 +55,17 @@ CHANGELOG.md          история версий
 Сборка без Gradle: `aapt2 → javac → d8 → zipalign → apksigner`. Нужны Android build-tools 34, platform android-34, JDK 17 и собственный keystore (в репозиторий не входит):
 
 ```sh
-KS=/путь/к/keystore.jks KSP=пароль VN=1.0 VC=1 ./android/build.sh
+KS=/путь/к/keystore.jks KSP=пароль VN=1.1 VC=2 ./android/build.sh
 ```
 
 Скрипт копирует `index.html` в assets и кладёт подписанный APK в `dist/`.
 
-Приложение проверено сборкой и подписью; запуск на реальном устройстве не проверялся.
+Для обновления поверх установленной версии APK должен быть подписан тем же ключом, а `VC` (versionCode) — увеличен.
+
+## Проверка
+
+Веб-версия проверена в Chromium в эмуляции телефонов 360×780, 412×915 и альбомной 844×390 (сенсорный ввод): отсутствие горизонтальной прокрутки, размеры элементов управления, ввод с запятой, переключение режимов, выбор строки, CSV, отсутствие ошибок JavaScript. APK проверен сборкой и подписью; на реальном Android-устройстве запуск не проверялся.
+
+## Лицензия
+
+[MIT](LICENSE) © 2026 Vadim Limar (wadi-li).

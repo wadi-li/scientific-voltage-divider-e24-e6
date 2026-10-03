@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#0b6e74">
 <title>Делитель напряжения E24/E6 — worst-case, ТКС/ТКЕ, АЧХ</title>
 <style>
-:root,[data-theme=light]{--bg:#eef0ec;--panel:#fff;--field:#f7f8f5;--ink:#161b19;--mut:#4f5955;--bd:#cfd5cf;--a:#0b6e74;--a2:#dcefee;--ok:#1e7b3a;--warn:#9a5600;--bad:#b0244f;--band:rgba(192,57,92,.20);--bandl:rgba(176,36,79,.8);--grid:rgba(30,40,36,.13);--sh:0 1px 2px rgba(20,30,25,.06),0 4px 14px rgba(20,30,25,.05)}
-[data-theme=dark]{--bg:#121514;--panel:#1b1f1e;--field:#232826;--ink:#e8ece9;--mut:#a7b1ad;--bd:#36403c;--a:#4fc1c6;--a2:#183a3b;--ok:#7fd88f;--warn:#f0b35e;--bad:#f08aa9;--band:rgba(240,120,160,.22);--bandl:rgba(240,138,169,.85);--grid:rgba(230,240,235,.12);--sh:none}
+:root,[data-theme=light]{--bg:#eef0ec;--panel:#fff;--field:#f7f8f5;--ink:#161b19;--mut:#4f5955;--bd:#cfd5cf;--a:#0b6e74;--a2:#dcefee;--ok:#1e7b3a;--warn:#9a5600;--bad:#b0244f;--band:rgba(192,57,92,.20);--bandl:rgba(176,36,79,.8);--grid:rgba(30,40,36,.13);--okbg:rgba(30,123,58,.13);--warnbg:rgba(154,86,0,.13);--badbg:rgba(176,36,79,.14);--hov:rgba(11,110,116,.07);--sh:0 1px 2px rgba(20,30,25,.06),0 4px 14px rgba(20,30,25,.05)}
+[data-theme=dark]{--bg:#121514;--panel:#1b1f1e;--field:#232826;--ink:#e8ece9;--mut:#a7b1ad;--bd:#36403c;--a:#4fc1c6;--a2:#183a3b;--ok:#7fd88f;--warn:#f0b35e;--bad:#f08aa9;--band:rgba(240,120,160,.22);--bandl:rgba(240,138,169,.85);--grid:rgba(230,240,235,.12);--okbg:rgba(127,216,143,.15);--warnbg:rgba(240,179,94,.15);--badbg:rgba(240,138,169,.18);--hov:rgba(79,193,198,.10);--sh:none}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--ink);font:14px/1.35 "Segoe UI",system-ui,-apple-system,Roboto,"Noto Sans",sans-serif;-webkit-text-size-adjust:100%}
@@ -18,7 +18,7 @@ button,input,select{font:inherit;color:inherit}
 .logo{width:28px;height:28px;flex:none}
 .ttl{font-weight:700;font-size:16px;white-space:nowrap}
 .ttl small{display:block;font-weight:500;font-size:11.5px;color:var(--mut);line-height:1.1}
-.sp{flex:1}
+.sp{flex:1}.ver{font-size:11.5px;font-weight:600;color:var(--mut);border:1px solid var(--bd);border-radius:5px;padding:0 4px;vertical-align:2px}
 .seg{display:inline-flex;background:var(--field);border:1px solid var(--bd);border-radius:8px;padding:2px;gap:2px}
 .seg button{border:0;background:transparent;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--mut);white-space:nowrap}
 .seg button.on{background:var(--a);color:#fff}
@@ -32,39 +32,40 @@ button,input,select{font:inherit;color:inherit}
 .col{display:flex;flex-direction:column;gap:10px;min-height:0;min-width:0}
 .col.in{overflow:auto;padding-right:2px}
 .pn{background:var(--panel);border:1px solid var(--bd);border-radius:10px;padding:9px 11px;box-shadow:var(--sh);min-width:0}
-.pn h2{font-size:13px;margin:0 0 7px;text-transform:uppercase;letter-spacing:.05em;color:var(--a);display:flex;align-items:center;gap:8px}
-.pn h2 .sp{flex:1}
+.pn h2{font-size:14px;margin:0 0 7px;letter-spacing:.01em;color:var(--a);display:flex;align-items:center;gap:8px}
+.pn h2 .sp{flex:1}.h2hint{color:var(--mut);font-weight:500;font-size:12px}.ver{font-size:11.5px;font-weight:600;color:var(--mut);border:1px solid var(--bd);border-radius:5px;padding:0 4px;vertical-align:2px}
 .f3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px 8px}
 .f2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 8px}
 .fd{display:flex;flex-direction:column;gap:2px;min-width:0}
 .fd>label,.lbl{font-size:12.5px;font-weight:600;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .s2{grid-column:span 2}.s3{grid-column:1/-1}
-input[type=number],select{height:31px;width:100%;border:1px solid var(--bd);border-radius:7px;background:var(--field);padding:0 8px;font-size:14px;min-width:0}
-input:focus,select:focus{outline:2px solid color-mix(in srgb,var(--a) 35%,transparent);border-color:var(--a)}
+input[type=number],input[type=text],select{height:31px;width:100%;border:1px solid var(--bd);border-radius:7px;background:var(--field);padding:0 8px;font-size:14px;min-width:0}
+input:focus,select:focus{outline:2px solid var(--a2);border-color:var(--a)}
 input:disabled,select:disabled{opacity:.45}
 .chk{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
 .chk input{width:16px;height:16px;accent-color:var(--a);margin:0}
+.segf{height:31px}.segf button{flex:1}.segf{display:flex}
 .hint{font-size:12px;color:var(--mut);margin-top:5px}
 .hid{display:none!important}
 .dis{opacity:.45;pointer-events:none}
 .status{font-size:12.5px;padding:6px 9px;border-radius:7px;background:var(--a2);color:var(--ink)}
-.status.e{background:color-mix(in srgb,var(--bad) 18%,transparent)}
+.status.e{background:var(--badbg)}
 /* results */
 .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
 .card{border:1px solid var(--bd);background:var(--field);border-radius:8px;padding:6px 9px;min-width:0}
-.card .k{font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .k{font-size:12px;font-weight:700;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card .val{font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card .sub{font-size:12px;color:var(--mut);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .card.w2{grid-column:span 2}.card.hl{border-color:var(--a);background:var(--a2)}
-.bdg{display:inline-block;padding:0 6px;border-radius:99px;font-size:11.5px;font-weight:700;margin-left:4px}
-.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,transparent)}.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 15%,transparent)}.err{color:var(--bad);background:color-mix(in srgb,var(--bad) 15%,transparent)}
+.bdg{display:inline-block;padding:0 6px;border-radius:99px;font-size:12px;font-weight:700;margin-left:4px}
+.ok{color:var(--ok);background:var(--okbg)}.warn{color:var(--warn);background:var(--warnbg)}.err{color:var(--bad);background:var(--badbg)}
 .tw{overflow:auto;border:1px solid var(--bd);border-radius:8px}
 table{border-collapse:collapse;width:100%;font-size:13px}
 th,td{padding:4px 8px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--bd)}
 th{position:sticky;top:0;background:var(--field);font-size:12px;color:var(--mut);font-weight:700;z-index:1}
 th:first-child,td:first-child{text-align:left}
 tbody tr:last-child td{border-bottom:0}
-#rows tr{cursor:pointer}#rows tr:hover td{background:color-mix(in srgb,var(--a) 7%,transparent)}
+#rows tr{cursor:pointer}#rows tr:hover td{background:var(--hov)}
 #rows tr.sel td{background:var(--a2);font-weight:700}
 td.t25{font-weight:700}
 .grow{flex:1;min-height:120px;display:flex;flex-direction:column}
@@ -76,10 +77,10 @@ td.t25{font-weight:700}
 .chopts{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12.5px}
 .chopts select{height:26px;width:auto;font-size:13px;padding:0 4px}
 .cv{flex:1;position:relative;min-height:150px}
-.cv canvas{position:absolute;inset:0;width:100%;height:100%}
+.cv canvas{position:absolute;top:0;left:0;right:0;bottom:0;width:100%;height:100%}
 .leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--mut);margin-top:3px}
 .leg i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:4px}
-.msg{position:absolute;inset:0;display:grid;place-items:center;color:var(--mut);font-size:13px;text-align:center;padding:10px}
+.msg{position:absolute;top:0;left:0;right:0;bottom:0;display:grid;place-items:center;color:var(--mut);font-size:13px;text-align:center;padding:10px}
 /* responsive */
 @media (max-width:1500px){.layout{grid-template-columns:410px minmax(0,1fr) minmax(0,1fr)}.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:1250px){
@@ -97,7 +98,7 @@ td.t25{font-weight:700}
  .col.charts{display:flex}
  .f3{grid-template-columns:repeat(2,minmax(0,1fr))}
  .s2{grid-column:span 1}.f3 .s3,.f3 .wide2{grid-column:1/-1}
- input[type=number],select{height:40px;font-size:16px}
+ input[type=number],input[type=text],select{height:40px;font-size:16px}
  .fd>label,.lbl{font-size:13px;white-space:normal}
  .chk{font-size:14px}.chk input{width:20px;height:20px}
  .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -105,15 +106,24 @@ td.t25{font-weight:700}
  .ch{height:300px;min-height:300px}
  .grow{min-height:0}.grow .tw{max-height:420px}
  table{font-size:13.5px}
- .seg button{padding:6px 10px;font-size:14px}
+ .seg button{padding:6px 10px;font-size:14px;min-height:40px;min-width:44px}
+ .bar{position:static}
+ .btn,.icon{min-height:40px;min-width:44px;font-size:14px}
+ .segf{height:40px}
+ .chk{min-height:40px;padding:0 2px}
+ .chopts{gap:4px 12px}.chopts select{height:40px;font-size:15px}
+ th,td{padding:8px 8px}
+ .card .k{font-size:12.5px}.hint,.leg,.card .sub,.h2hint{font-size:13px}.bdg{font-size:12.5px}
+ .ttl small{display:none}.ver{font-size:12px}
 }
+@media (max-width:600px){.opt{display:none}.h2hint{display:none}}
 @media print{.bar .icon,.bar .btn{display:none}}
 </style>
 </head>
 <body>
 <header class="bar">
  <svg class="logo" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="6" fill="var(--a)"/><path d="M14 3v4M14 21v4M10.5 7h7v5h-7zM10.5 16h7v5h-7zM14 12v4M8 14h-2M20 14h2" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
- <div class="ttl">Делитель напряжения E24 / E6<small>допуски · ТКС · ТКЕ · Vfb · нагрузка · RC/АЧХ</small></div>
+ <div class="ttl">Делитель напряжения E24 / E6 <span class="ver">v1.1</span><small>допуски · ТКС · ТКЕ · Vfb · нагрузка · RC/АЧХ</small></div>
  <div class="sp"></div>
  <div class="seg mode" id="modeSeg"><button data-v="vin" class="on"><span class="l">Известно </span>Vin → <span class="l">ищем </span>Vout</button><button data-v="vfb"><span class="l">Известно </span>Vout (Vfb) → <span class="l">ищем </span>Vin</button></div>
  <div class="seg" id="unitSeg" title="Единицы напряжения"><button data-v="V" class="on">V</button><button data-v="mV">mV</button></div>
@@ -131,7 +141,7 @@ td.t25{font-weight:700}
    <div class="fd"><label for="vin" id="lVin">Vin, V</label><input id="vin" type="number" step="0.05" min="0" value="12"></div>
    <div class="fd"><label for="vout" id="lVout">Желаемое Vout, V</label><input id="vout" type="number" step="0.05" min="0" value="5"></div>
    <div class="fd"><label class="lbl" id="lRef">Точность Vin</label>
-    <div class="seg" id="refSeg" style="height:31px"><button data-v="pct" class="on">±%</button><button data-v="lim">min/max</button></div></div>
+    <div class="seg segf" id="refSeg"><button data-v="pct" class="on">±%</button><button data-v="lim">min/max</button></div></div>
    <div class="fd" id="fRefPct"><label for="refPct" id="lRefPct">Отклонение Vin, ±%</label><input id="refPct" type="number" step="0.1" min="0" value="0"></div>
    <div class="fd hid" id="fRefMin"><label for="refMin" id="lRefMin">Vin.min, V</label><input id="refMin" type="number" step="0.05" min="0" value="11.4"></div>
    <div class="fd hid" id="fRefNom"><label for="refNom" id="lRefNom">Vin.nom, V</label><input id="refNom" type="number" step="0.05" min="0" value="12"></div>
@@ -185,7 +195,7 @@ td.t25{font-weight:700}
 
 <!-- ============ РЕЗУЛЬТАТЫ ============ -->
 <section class="col out">
- <div class="pn"><h2>Выбранная пара <span class="sp"></span><span style="text-transform:none;letter-spacing:0;color:var(--mut);font-weight:500;font-size:12px">клик по строке таблицы — выбрать другую</span></h2><div class="cards" id="cards"></div></div>
+ <div class="pn"><h2>Выбранная пара <span class="sp"></span><span class="h2hint">выбор — нажатием на строку таблицы пар</span></h2><div class="cards" id="cards"></div></div>
  <div class="pn"><h2 id="wcTitle">Worst-case по температуре</h2>
   <div class="tw"><table><thead id="tHead"></thead><tbody id="temps"></tbody></table></div>
   <div class="hint" id="wcHint"></div>
@@ -228,6 +238,9 @@ const TS=[-55,-40,-20,0,25,55,85];
 const TCOL=['#2c3fb0','#3f74d6','#1ea0c8','#169c86','INK','#e08a1e','#cc2f2a'];
 const TCC={c0g:[30],x7r:[500,1000,1500,2000]};
 const $=id=>document.getElementById(id);
+/* Сенсорные устройства: type=number в Chrome/WebView отбрасывает запятую — используем текстовое поле с цифровой клавиатурой */
+const TOUCH=window.matchMedia&&matchMedia('(pointer:coarse)').matches;
+if(TOUCH)document.querySelectorAll('input[type=number]').forEach(e=>{e.type='text';e.inputMode='decimal';e.autocomplete='off';e.spellcheck=false});
 const S={mode:'vin',unit:'V',ref:'pct',cm:'fc',selKey:null,list:[],cur:null};
 const STORE='vdiv-e24e6-v2';
 
@@ -237,10 +250,11 @@ function trim(s){return s.indexOf('.')<0?s:s.replace(/0+$/,'').replace(/\.$/,'')
 function fr(r){if(!isFinite(r))return'∞';if(r>=1e6)return dec(trim((r/1e6).toFixed(3)))+' MΩ';if(r>=1e3)return dec(trim((r/1e3).toFixed(3)))+' kΩ';return dec(trim(r.toFixed(2)))+' Ω'}
 function fcap(c){if(c>=1e-6)return dec(trim((c*1e6).toFixed(3)))+' µF';if(c>=1e-9)return dec(trim((c*1e9).toFixed(3)))+' nF';return dec(trim((c*1e12).toFixed(2)))+' pF'}
 function ffr(f){if(!isFinite(f))return'—';if(f>=1e6)return dec(trim((f/1e6).toFixed(3)))+' MHz';if(f>=1e3)return dec(trim((f/1e3).toFixed(3)))+' kHz';return dec(trim(f.toFixed(2)))+' Hz'}
-function fv(v,d){const m=S.unit==='mV'?1e3:1,n=v*m;if(d==null)d=Math.abs(n)>=1000?2:Math.abs(n)>=100?3:Math.abs(n)>=10?4:5;return dec(n.toFixed(d))+' '+S.unit}
+/* d — число знаков после запятой для значений 1…10; фактически сохраняется d+1 значащих цифр при любом порядке */
+function fv(v,d){const m=S.unit==='mV'?1e3:1,n=v*m,sig=(d==null?5:d)+1;if(!isFinite(n))return'—';const e=n===0?0:Math.floor(Math.log10(Math.abs(n)));const k=Math.max(0,Math.min(9,sig-1-e));return dec(n.toFixed(k))+' '+S.unit}
 function fp(v,d=3){return(v>=0?'+':'−')+dec(Math.abs(v).toFixed(d))+' %'}
 function fI(i){return i>=1e-3?dec(trim((i*1e3).toFixed(3)))+' mA':dec(trim((i*1e6).toFixed(2)))+' µA'}
-function fP(p){return p>=1?dec(trim(p.toFixed(3)))+' W':p>=1e-3?dec(trim((p*1e3).toFixed(2)))+' mW':dec(trim((p*1e6).toFixed(1)))+' µW'}
+function fP(p){return p>=1?dec(trim(p.toFixed(3)))+' W':p>=1e-3?dec(trim((p*1e3).toFixed(2)))+' mW':p>=1e-6?dec(trim((p*1e6).toFixed(2)))+' µW':dec(trim((p*1e9).toFixed(2)))+' nW'}
 const tS=T=>(T>0?'+':T<0?'−':'')+Math.abs(T);
 const par=(a,b)=>!isFinite(a)?b:!isFinite(b)?a:a*b/(a+b);
 
@@ -372,7 +386,7 @@ function renderCards(){
   ['R1 (верх)',fr(z.r1),`±${dec(String(x.tol1*100))} % · ${x.tcr1} ppm/°C`],
   ['R2 (низ)',fr(z.r2),`±${dec(String(x.tol2*100))} % · ${x.tcr2} ppm/°C`],
   [sName+' расчётное',fv(z.v),`цель ${fv(x.target)}`,1],
-  ['Отклонение',fp(z.e)+`<span class="bdg ${g[0]}">${g[1]}</span>`,'относительно желаемого'],
+  ['Отклонение',fp(z.e),`<span class="bdg ${g[0]}" style="margin:0 4px 0 0">${g[1]}</span>от желаемого`],
   ['Worst-case '+sName,`${fv(z.wmin,4)} … ${fv(z.wmax,4)}`.replace(/ (m?V) …/,' …'),`${fp((z.wmin/z.v-1)*100,2)} / ${fp((z.wmax/z.v-1)*100,2)} · −55…+85 °C, допуски, ТКС, ${x.mode==='vin'?'Vin':'Vfb'}`,2],
   ['R↓ = R2'+(x.loadOn?' ∥ Rн':''),fr(z.lo),`R1+R2 = ${fr(z.r1+z.r2)}`],
   ['Ток делителя',fI(z.i),`P(R1) ${fP(pr1)} · P(R2) ${fP(pr2)}`],
@@ -383,21 +397,21 @@ function renderCards(){
   cards.push(['Частоты RC',ffr(z.fx),`полюс по Req ${fr(z.req)}: ${ffr(z.fp)}`]);
   cards.push([`|H| на ${ffr(x.fan)}`,dec((20*Math.log10(mag(Hn))).toFixed(2))+' dB',`|H| = ${dec(mag(Hn).toFixed(5))} · φ = ${dec(ph(Hn).toFixed(2))}°`]);
  } else cards.push(['Kдел DC',dec(z.k.toFixed(6)),`1/K = ${dec((1/z.k).toFixed(5))}`]);
- $('cards').innerHTML=cards.map(c=>`<div class="card${c[3]===1?' hl':c[3]===2?' w2':''}"><div class="k">${c[0]}</div><div class="val">${c[1]}</div><div class="sub" title="${c[2]}">${c[2]}</div></div>`).join('');
+ $('cards').innerHTML=cards.map(c=>`<div class="card${c[3]===1?' hl':c[3]===2?' w2':''}"><div class="k">${c[0]}</div><div class="val">${c[1]}</div><div class="sub">${c[2]}</div></div>`).join('');
 }
 function renderTemps(){
  const x=S.x,z=S.cur,sName=x.mode==='vin'?'Vout':'Vin',refN=x.mode==='vin'?'Vin':'Vfb';
  $('wcTitle').textContent=`Worst-case ${sName} по температуре (DC)`;
- $('tHead').innerHTML=`<tr><th>T, °C</th><th>R1(T)</th><th>R2(T)</th><th>${sName} ном.</th><th>${sName} min</th><th>${sName} max</th><th>Уход ном. от +25</th><th>Разброс −/+</th></tr>`;
+ $('tHead').innerHTML=`<tr><th>T, °C</th><th class="opt">R1(T)</th><th class="opt">R2(T)</th><th>${sName} ном.</th><th>${sName} min</th><th>${sName} max</th><th>Уход ном. от +25</th><th>Разброс −/+</th></tr>`;
  const fl={tol:1,tcr:1,tcc:1,ref:1},n25=nominal(x,z,25,null,fl);
  S.temps=TS.map(T=>{const n=nominal(x,z,T,null,fl),[a,b]=corners(x,z,T,null,fl);return{T,r1:rT(z.r1,x.tcr1,T),r2:rT(z.r2,x.tcr2,T),n,a,b,d:(n/n25-1)*100,lo:(a/n-1)*100,hi:(b/n-1)*100}});
- $('temps').innerHTML=S.temps.map(t=>`<tr><td class="${t.T===25?'t25':''}">${tS(t.T)}</td><td>${fr(t.r1)}</td><td>${fr(t.r2)}</td><td class="${t.T===25?'t25':''}">${fv(t.n)}</td><td>${fv(t.a)}</td><td>${fv(t.b)}</td><td>${fp(t.d,4)}</td><td>${fp(t.lo,2)} / ${fp(t.hi,2)}</td></tr>`).join('');
+ $('temps').innerHTML=S.temps.map(t=>`<tr><td class="${t.T===25?'t25':''}">${tS(t.T)}</td><td class="opt">${fr(t.r1)}</td><td class="opt">${fr(t.r2)}</td><td class="${t.T===25?'t25':''}">${fv(t.n)}</td><td>${fv(t.a)}</td><td>${fv(t.b)}</td><td>${fp(t.d,4)}</td><td>${fp(t.lo,2)} / ${fp(t.hi,2)}</td></tr>`).join('');
  $('wcHint').textContent=`${refN}: ${fv(x.ref.min)} … ${fv(x.ref.max)} (ном. ${fv(x.ref.nom)}). Номинал при T — ТКС обоих резисторов со знаком «+»; границы — независимые ± допуски и ± ТКС каждого плеча, крайние ${refN}. Конденсатор на DC не влияет.`;
 }
 function renderPairs(){
  const x=S.x,sName=x.mode==='vin'?'Vout':'Vin';
- $('pHead').innerHTML=`<tr><th>#</th><th>R1</th><th>R2</th><th>R↓</th><th>Vin</th><th>Vout</th><th>Откл.</th><th>R1+R2</th><th>I</th><th>WC ${sName} min…max</th>${x.rc?'<th>C E6</th><th>f(|Xc|=R)</th>':''}</tr>`;
- $('rows').innerHTML=S.list.map((z,i)=>`<tr data-i="${i}" class="${z===S.cur?'sel':''}"><td>${i+1}</td><td>${fr(z.r1)}</td><td>${fr(z.r2)}</td><td>${fr(z.lo)}</td><td>${fv(z.vinA)}</td><td>${fv(z.voutA)}</td><td>${fp(z.e)}</td><td>${fr(z.r1+z.r2)}</td><td>${fI(z.i)}</td><td>${fv(z.wmin,4)} … ${fv(z.wmax,4)}</td>${x.rc?`<td>${fcap(z.c)}</td><td>${ffr(z.fx)}</td>`:''}</tr>`).join('');
+ $('pHead').innerHTML=`<tr><th>#</th><th>R1</th><th>R2</th><th class="opt">R↓</th><th>Vin</th><th>Vout</th><th>Откл.</th><th class="opt">R1+R2</th><th class="opt">I</th><th>WC ${sName} min…max</th>${x.rc?'<th>C E6</th><th>f(|Xc|=R)</th>':''}</tr>`;
+ $('rows').innerHTML=S.list.map((z,i)=>`<tr data-i="${i}" class="${z===S.cur?'sel':''}"><td>${i+1}</td><td>${fr(z.r1)}</td><td>${fr(z.r2)}</td><td class="opt">${fr(z.lo)}</td><td>${fv(z.vinA)}</td><td>${fv(z.voutA)}</td><td>${fp(z.e)}</td><td class="opt">${fr(z.r1+z.r2)}</td><td class="opt">${fI(z.i)}</td><td>${fv(z.wmin,4)} … ${fv(z.wmax,4)}</td>${x.rc?`<td>${fcap(z.c)}</td><td>${ffr(z.fx)}</td>`:''}</tr>`).join('');
 }
 
 /* ---------- charts ---------- */
@@ -429,7 +443,7 @@ function frame(g,w,h,o){
 function line(g,P,col,wd,dash){g.beginPath();P.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.strokeStyle=col;g.lineWidth=wd;g.setLineDash(dash||[]);g.stroke();g.setLineDash([])}
 function band(g,U,L){g.beginPath();U.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));for(let i=L.length-1;i>=0;i--)g.lineTo(L[i][0],L[i][1]);g.closePath();g.fillStyle=css('--band');g.fill()}
 function yr(vals,minSpan,padF=.12){let a=Math.min(...vals),b=Math.max(...vals);if(b-a<minSpan){const c=(a+b)/2;a=c-minSpan/2;b=c+minSpan/2}const p=(b-a)*padF;return[a-p,b+p]}
-function freqs(x,z){const f0=z.fx||1e3,n=160,a=Math.log10(f0)-3,b=Math.log10(f0)+3;return Array.from({length:n},(_,i)=>Math.pow(10,a+(b-a)*i/(n-1)))}
+function freqs(x,z){const n=200,f1=Math.min(z.fx||1e3,z.fp||1e3),f2=Math.max(z.fx||1e3,z.fp||1e3);let a=Math.log10(f1)-2,b=Math.log10(f2)+2;if(b-a<6){const c=(a+b)/2;a=c-3;b=c+3}if(b-a>10){const c=Math.log10(z.fp||f2);a=c-5;b=c+5}return Array.from({length:n},(_,i)=>Math.pow(10,a+(b-a)*i/(n-1)))}
 function tcol(i){return TCOL[i]==='INK'?css('--ink'):TCOL[i]}
 function drawFam(){
  const x=S.x,z=S.cur;$('mFam').classList.toggle('hid',x.rc);
@@ -437,8 +451,8 @@ function drawFam(){
  const F=freqs(x,z),D=TS.map(T=>F.map(f=>20*Math.log10(mag(H(x,rT(z.r1,x.tcr1,T),rT(z.r2,x.tcr2,T),x.rl,cNom(x,z.c,T),f))))),all=D.flat();
  const[y0,y1]=yr(all,1);const A=frame(g,w,h,{xlog:1,x0:F[0],x1:F[F.length-1],y0,y1,yl:'|H|, dB',xl:'f'});
  D.forEach((d,i)=>line(g,d.map((v,j)=>[A.X(F[j]),A.Y(v)]),tcol(i),i===4?2.2:1.6));
- line(g,[[A.X(z.fx),A.m.t],[A.X(z.fx),h-A.m.b]],css('--mut'),1,[4,4]);
- $('legFam').innerHTML=TS.map((T,i)=>`<span><i style="background:${tcol(i)}"></i>${tS(T)} °C</span>`).join('')+`<span>пунктир — ${ffr(z.fx)}</span>`;
+ line(g,[[A.X(z.fx),A.m.t],[A.X(z.fx),h-A.m.b]],css('--mut'),1,[4,4]);if(Math.abs(Math.log10(z.fp/z.fx))>.02)line(g,[[A.X(z.fp),A.m.t],[A.X(z.fp),h-A.m.b]],css('--bandl'),1,[2,3]);
+ $('legFam').innerHTML=TS.map((T,i)=>`<span><i style="background:${tcol(i)}"></i>${tS(T)} °C</span>`).join('')+`<span>пунктир — |Xc| = R: ${ffr(z.fx)}</span>`+(Math.abs(Math.log10(z.fp/z.fx))>.02?`<span style="color:${css('--bandl')}">точки — полюс по Req: ${ffr(z.fp)}</span>`:'');
 }
 function drawWc(){
  const x=S.x,z=S.cur;$('mWc').classList.toggle('hid',x.rc);
@@ -493,7 +507,7 @@ function applyLabels(){
  $('lRefPct').textContent='Отклонение '+r+', ±%';
  $('lRefMin').textContent=r+'.min, '+u;$('lRefNom').textContent=r+'.nom, '+u;$('lRefMax').textContent=r+'.max, '+u;
  const p=S.ref==='pct';$('fRefPct').classList.toggle('hid',!p);['fRefMin','fRefNom','fRefMax'].forEach(i=>$(i).classList.toggle('hid',p));
- $('refNom').value=$(vin?'vin':'vout').value;
+ $('refNom').value=$(vin?'vin':'vout').value;S.prevNom=num('refNom');
  if(!p){const n=num('refNom'),a=num('refMin'),b=num('refMax');if(!(a>0&&a<=n&&b>=n)){$('refMin').value=+(n*0.98).toPrecision(6);$('refMax').value=+(n*1.02).toPrecision(6)}}
  $('refHint').textContent=vin?'Точность входного источника Vin: ±% или min/max.':'Точность опорного Vfb: ±% или Vfb.min / nom / max из datasheet.';
  const st=u==='mV'?'50':'0.05';['vin','vout','refMin','refNom','refMax'].forEach(i=>$(i).step=st);
@@ -526,7 +540,10 @@ segInit('cSeg','cm',applyRC);
 document.querySelectorAll('input,select').forEach(el=>el.addEventListener(el.tagName==='SELECT'||el.type==='checkbox'?'change':'input',()=>{
  const id=el.id;
  if(['tol1','tol2','tcr1','tcr2','same'].includes(id))syncSame(id);
- if(id==='refNom'){$(S.mode==='vin'?'vin':'vout').value=el.value}
+ const kid=S.mode==='vin'?'vin':'vout';
+ if((id==='refNom'||id===kid)&&S.ref==='lim'){const nv=num(id),pv=S.prevNom;if(nv>0&&pv>0&&nv!==pv){['refMin','refMax'].forEach(i=>{const v=num(i);if(v>0)$(i).value=+(v*nv/pv).toPrecision(6)})}}
+ if(id==='refNom'){$(kid).value=el.value}
+ if(id==='refNom'||id===kid){const nv=num(id);if(nv>0)S.prevNom=nv}
  if(id==='vin'||id==='vout')$('refNom').value=$(S.mode==='vin'?'vin':'vout').value;
  if(['rcOn','loadOn','diel','branch'].includes(id))applyRC();
  if(['tsel','uTol','uTcr','uTcc','uRef','vtF'].includes(id)){saveState();drawAll();return}
@@ -545,7 +562,7 @@ $('csv').onclick=()=>{
  rows.push(['Выбранная пара','R1 = '+fr(S.cur.r1),'R2 = '+fr(S.cur.r2)]);
  rows.push([...$('tHead').querySelectorAll('th')].map(t=>t.textContent));
  $('temps').querySelectorAll('tr').forEach(tr=>rows.push([...tr.children].map(td=>td.textContent)));
- const txt='\ufeff'+rows.map(r=>r.map(csvCell).join(';')).join('\r\n'),name='divider-e24-'+fr(S.cur.r1).replace(/\s/g,'')+'-'+fr(S.cur.r2).replace(/\s/g,'')+'.csv';
+ const txt='\ufeff'+rows.map(r=>r.map(csvCell).join(';')).join('\r\n'),an=r=>fr(r).replace(/\s/g,'').replace(',','.').replace('MΩ','M').replace('kΩ','k').replace('Ω','R'),name='divider-e24-R1_'+an(S.cur.r1)+'-R2_'+an(S.cur.r2)+'.csv';
  if(window.AndroidBridge&&AndroidBridge.saveFile){AndroidBridge.saveFile(name,txt);return}
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/csv;charset=utf-8'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
 };
